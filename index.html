@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Tech Academy - Master the Future of Technology</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .hero-gradient {
+            background: linear-gradient(135deg, rgba(11, 15, 20, 0.95) 0%, rgba(30, 41, 59, 0.98) 50%, rgba(11, 15, 20, 0.95) 100%), url('https://placehold.co/1920x1080/0b0f14/e2e8f0?text=AI+Abstract');
+            background-size: cover;
+            background-position: center;
+        }
+        .cta-glow {
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.6), 0 0 5px rgba(59, 130, 246, 0.4);
+            transition: all 0.3s ease-in-out;
+        }
+        .cta-glow:hover {
+            box-shadow: 0 0 25px rgba(59, 130, 246, 0.8), 0 0 10px rgba(59, 130, 246, 0.6);
+            transform: translateY(-2px);
+        }
+        .hidden {
+            display: none;
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-gray-300">
+
+    <!-- App Container -->
+    <div id="app">
+
+        <!-- Header & Navigation -->
+        <header id="header" class="bg-slate-900/80 backdrop-blur-sm sticky top-0 z-50 transition-all duration-300">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-20">
+                    <div class="flex-shrink-0">
+                        <a href="#" id="home-link" class="text-2xl font-bold text-white">
+                            <span class="text-blue-400">AI</span> Tech Academy
+                        </a>
+                    </div>
+                    <nav class="hidden md:flex md:space-x-8">
+                        <a href="#features" class="nav-link text-gray-300 hover:text-blue-400 transition-colors duration-300 font-medium">Why Us</a>
+                        <a href="#courses" class="nav-link text-gray-300 hover:text-blue-400 transition-colors duration-300 font-medium">Courses</a>
+                        <a href="#instructors" class="nav-link text-gray-300 hover:text-blue-400 transition-colors duration-300 font-medium">Instructors</a>
+                        <a href="#contact" class="nav-link text-gray-300 hover:text-blue-400 transition-colors duration-300 font-medium">Contact</a>
+                    </nav>
+                    <div class="hidden md:block">
+                        <a href="#" id="auth-button" class="inline-block bg-blue-500 text-white font-semibold px-5 py-2 rounded-lg hover:bg-blue-600 transition-colors duration-300">Sign In</a>
+                         <a href="#" id="dashboard-button" class="hidden inline-block bg-slate-800 text-white font-semibold px-5 py-2 rounded-lg hover:bg-slate-700 transition-colors duration-300">Dashboard</a>
+                         <a href="#" id="admin-button" class="hidden inline-block bg-indigo-500 text-white font-semibold px-5 py-2 rounded-lg hover:bg-indigo-600 transition-colors duration-300 ml-2">Admin</a>
+                        <a href="#" id="logout-button" class="hidden inline-block bg-red-500 text-white font-semibold px-5 py-2 rounded-lg hover:bg-red-600 transition-colors duration-300 ml-2">Logout</a>
+                    </div>
+                    <div class="md:hidden">
+                        <button id="mobile-menu-button" class="text-gray-300 hover:text-white focus:outline-none">
+                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div id="mobile-menu" class="hidden md:hidden">
+                <a href="#features" class="nav-link block py-2 px-4 text-sm hover:bg-slate-800">Why Us</a>
+                <a href="#courses" class="nav-link block py-2 px-4 text-sm hover:bg-slate-800">Courses</a>
+                <a href="#instructors" class="nav-link block py-2 px-4 text-sm hover:bg-slate-800">Instructors</a>
+                <a href="#contact" class="nav-link block py-2 px-4 text-sm hover:bg-slate-800">Contact</a>
+                 <div class="border-t border-slate-700 my-2"></div>
+                <a href="#" id="mobile-auth-button" class="block py-2 px-4 text-sm hover:bg-slate-800">Sign In</a>
+                <a href="#" id="mobile-dashboard-button" class="hidden block py-2 px-4 text-sm hover:bg-slate-800">Dashboard</a>
+                <a href="#" id="mobile-admin-button" class="hidden block py-2 px-4 text-sm hover:bg-slate-800">Admin</a>
+                <a href="#" id="mobile-logout-button" class="hidden block py-2 px-4 text-sm hover:bg-slate-800">Logout</a>
+            </div>
+        </header>
+
+        <!-- Page Content -->
+        <div id="page-content">
+            <!-- Landing Page View -->
+            <div id="landing-page">
+                <main>
+                    <!-- All landing page sections from before -->
+                    <section class="hero-gradient pt-24 pb-32">
+                        <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                            <h1 class="text-4xl md:text-6xl font-extrabold text-white leading-tight mb-6">Unlock the Power of AI. <br class="hidden md:block"><span class="text-blue-400">Shape the Future.</span></h1>
+                            <p class="max-w-3xl mx-auto text-lg md:text-xl text-gray-300 mb-10">Our academy provides cutting-edge courses in Artificial Intelligence and Machine Learning, designed to transform you into a world-class expert.</p>
+                            <a href="#courses" class="cta-glow nav-link inline-block bg-blue-500 text-white font-bold text-lg px-10 py-4 rounded-lg transition-transform duration-300">Explore Our Courses</a>
+                        </div>
+                    </section>
+                    <section id="features" class="py-20 bg-slate-900">
+                        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                            <div class="text-center mb-12"><h2 class="text-3xl md:text-4xl font-bold text-white">Why Learn With Us?</h2><p class="mt-4 text-lg text-gray-400">A curriculum designed for the future of technology.</p></div>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+                                <div class="bg-slate-800 p-8 rounded-lg"><h3 class="text-xl font-bold text-white mb-2">Expert-Led Curriculum</h3><p class="text-gray-400">Courses crafted by industry veterans and leading AI researchers.</p></div>
+                                <div class="bg-slate-800 p-8 rounded-lg"><h3 class="text-xl font-bold text-white mb-2">Hands-On Projects</h3><p class="text-gray-400">Apply your knowledge with real-world projects and case studies.</p></div>
+                                <div class="bg-slate-800 p-8 rounded-lg"><h3 class="text-xl font-bold text-white mb-2">Career Focused</h3><p class="text-gray-400">Gain the skills that top tech companies are looking for right now.</p></div>
+                            </div>
+                        </div>
+                    </section>
+                    <section id="courses" class="py-20 bg-slate-950">
+                        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                            <div class="text-center mb-12"><h2 class="text-3xl md:text-4xl font-bold text-white">Our Premier Courses</h2><p class="mt-4 text-lg text-gray-400">Choose your path to becoming an AI specialist.</p></div>
+                            <div id="course-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"><p class="text-gray-400 col-span-full text-center">Loading courses...</p></div>
+                        </div>
+                    </section>
+                    <section id="instructors" class="py-20 bg-slate-900">
+                        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                            <div class="text-center mb-12"><h2 class="text-3xl md:text-4xl font-bold text-white">Meet Our Instructors</h2><p class="mt-4 text-lg text-gray-400">Learn from the best in the industry.</p></div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                                <div class="bg-slate-800 p-6 rounded-lg text-center"><img class="w-24 h-24 rounded-full mx-auto mb-4" src="https://placehold.co/100x100/1e293b/94a3b8?text=JD" alt="Instructor Jane Doe"><h3 class="text-xl font-bold text-white">Dr. Jane Doe</h3><p class="text-blue-400">Lead ML Scientist</p></div>
+                                <div class="bg-slate-800 p-6 rounded-lg text-center"><img class="w-24 h-24 rounded-full mx-auto mb-4" src="https://placehold.co/100x100/1e293b/94a3b8?text=JS" alt="Instructor John Smith"><h3 class="text-xl font-bold text-white">John Smith</h3><p class="text-blue-400">AI Ethics Specialist</p></div>
+                                <div class="bg-slate-800 p-6 rounded-lg text-center"><img class="w-24 h-24 rounded-full mx-auto mb-4" src="https://placehold.co/100x100/1e293b/94a3b8?text=AL" alt="Instructor Alex Lee"><h3 class="text-xl font-bold text-white">Alex Lee</h3><p class="text-blue-400">Data Science Architect</p></div>
+                            </div>
+                        </div>
+                    </section>
+                    <section id="contact" class="py-20 bg-slate-950">
+                        <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                            <h2 class="text-3xl md:text-4xl font-bold text-white">Ready to Start Your Journey?</h2><p class="mt-4 text-lg text-gray-400 max-w-2xl mx-auto">Have questions about our courses or enrollment process? Reach out to our admissions team.</p>
+                            <a href="mailto:admissions@aitech.academy" class="mt-8 cta-glow inline-block bg-blue-500 text-white font-bold text-lg px-10 py-4 rounded-lg transition-transform duration-300">Contact Us</a>
+                        </div>
+                    </section>
+                </main>
+            </div>
+            <!-- Other pages -->
+            <div id="dashboard-page" class="hidden"><main class="container mx-auto px-4 sm:px-6 lg:px-8 py-12"><h1 class="text-3xl md:text-4xl font-bold text-white mb-8">My Dashboard</h1><div id="user-info" class="mb-8 p-6 bg-slate-800 rounded-lg"></div><div><h2 class="text-2xl font-bold text-white mb-4">My Courses</h2><div id="my-courses-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"><p class="text-gray-400 col-span-full">You are not enrolled in any courses yet.</p></div></div></main></div>
+            <div id="course-detail-page" class="hidden"><main class="container mx-auto px-4 sm:px-6 lg:px-8 py-12"><div class="mb-8"><a href="#" id="back-to-courses-link" class="text-blue-400 hover:text-blue-300">&larr; Back to All Courses</a></div><div id="course-detail-content"><p class="text-white text-center">Loading course...</p></div></main></div>
+            <div id="admin-page" class="hidden"><main class="container mx-auto px-4 sm:px-6 lg:px-8 py-12"><h1 class="text-3xl md:text-4xl font-bold text-white mb-8">Admin Panel</h1><div class="bg-slate-800 p-8 rounded-lg max-w-4xl mx-auto"><h2 class="text-2xl font-bold text-white mb-6">Create a New Course</h2><form id="add-course-form"><div id="course-form-success" class="hidden text-green-400 text-sm mb-4 text-center p-2 bg-green-900/50 rounded"></div><div id="course-form-error" class="hidden text-red-400 text-sm mb-4 text-center p-2 bg-red-900/50 rounded"></div><div class="mb-4"><label for="course-title" class="block text-sm font-medium text-gray-300 mb-2">Course Title</label><input type="text" id="course-title" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white" required></div><div class="mb-4"><label for="course-description" class="block text-sm font-medium text-gray-300 mb-2">Course Description</label><textarea id="course-description" rows="3" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white" required></textarea></div><div class="mb-4"><label for="course-image-upload" class="block text-sm font-medium text-gray-300 mb-2">Upload Course Image (Option 1)</label><input type="file" id="course-image-upload" class="w-full text-sm text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-500 file:text-white hover:file:bg-blue-600" accept="image/png, image/jpeg, image/gif"></div><div class="mb-4"><label for="course-image-url" class="block text-sm font-medium text-gray-300 mb-2">Or Paste Image URL (Option 2)</label><input type="text" id="course-image-url" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white" placeholder="https://example.com/image.jpg"></div><div class="mb-6"><label for="course-modules" class="block text-sm font-medium text-gray-300 mb-2">Modules & Lessons (JSON format)</label><textarea id="course-modules" rows="8" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white font-mono text-sm" required></textarea><p class="text-xs text-gray-400 mt-2">Enter a valid JSON array. Example provided in the text area.</p></div><button type="submit" id="add-course-button" class="w-full bg-blue-500 text-white font-semibold py-2 rounded-lg hover:bg-blue-600">Add Course</button></form></div><div class="bg-slate-800 p-8 rounded-lg max-w-4xl mx-auto mt-12"><h2 class="text-2xl font-bold text-white mb-6">Manage Existing Courses</h2><div id="manage-courses-list" class="space-y-4"><p class="text-gray-400 text-center">Loading courses...</p></div></div></main></div>
+        </div>
+
+        <!-- Modals -->
+        <div id="auth-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"><div class="bg-slate-800 p-8 rounded-lg max-w-sm w-full mx-4 relative"><button id="auth-modal-close" class="absolute top-2 right-3 text-gray-400 hover:text-white text-2xl">&times;</button><h2 id="auth-title" class="text-2xl font-bold text-white text-center mb-6">Sign In</h2><form id="auth-form"><div id="auth-error" class="hidden text-red-400 text-sm mb-4 text-center p-2 bg-red-900/50 rounded"></div><div class="mb-4"><label for="email" class="block text-sm font-medium text-gray-300 mb-2">Email Address</label><input type="email" id="email" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white" required></div><div class="mb-6"><label for="password" class="block text-sm font-medium text-gray-300 mb-2">Password</label><input type="password" id="password" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white" required></div><button type="submit" id="auth-submit-button" class="w-full bg-blue-500 text-white font-semibold py-2 rounded-lg hover:bg-blue-600">Sign In</button></form><p class="text-center text-sm text-gray-400 mt-4"><a href="#" id="auth-toggle-link">Don't have an account? Sign Up</a></p></div></div>
+        <div id="edit-course-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"><div class="bg-slate-800 p-8 rounded-lg max-w-2xl w-full mx-4 relative overflow-y-auto max-h-screen"><button id="edit-modal-close" class="absolute top-2 right-3 text-gray-400 hover:text-white text-2xl">&times;</button><h2 class="text-2xl font-bold text-white text-center mb-6">Edit Course</h2><form id="edit-course-form"><input type="hidden" id="edit-course-id"><div id="edit-form-success" class="hidden text-green-400 text-sm mb-4 text-center p-2 bg-green-900/50 rounded"></div><div id="edit-form-error" class="hidden text-red-400 text-sm mb-4 text-center p-2 bg-red-900/50 rounded"></div><div class="mb-4"><label for="edit-course-title" class="block text-sm font-medium text-gray-300 mb-2">Course Title</label><input type="text" id="edit-course-title" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white" required></div><div class="mb-4"><label for="edit-course-description" class="block text-sm font-medium text-gray-300 mb-2">Course Description</label><textarea id="edit-course-description" rows="3" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white" required></textarea></div><div class="mb-4"><label class="block text-sm font-medium text-gray-300 mb-2">Current Image</label><img id="edit-course-image-preview" src="" class="w-32 h-20 object-cover rounded mb-2"><label for="edit-course-image-upload" class="block text-sm font-medium text-gray-300 mb-2">Upload New Image (Option 1)</label><input type="file" id="edit-course-image-upload" class="w-full text-sm text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-500 file:text-white hover:file:bg-blue-600" accept="image/png, image/jpeg, image/gif"></div><div class="mb-4"><label for="edit-course-image-url" class="block text-sm font-medium text-gray-300 mb-2">Or Paste New Image URL (Option 2)</label><input type="text" id="edit-course-image-url" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white" placeholder="https://example.com/image.jpg"></div><div class="mb-6"><label for="edit-course-modules" class="block text-sm font-medium text-gray-300 mb-2">Modules & Lessons (JSON format)</label><textarea id="edit-course-modules" rows="8" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white font-mono text-sm" required></textarea></div><div class="flex items-center justify-between"><button type="submit" id="update-course-button" class="bg-blue-500 text-white font-semibold py-2 px-6 rounded-lg hover:bg-blue-600">Save Changes</button><button type="button" id="delete-course-button" class="bg-red-600 text-white font-semibold py-2 px-6 rounded-lg hover:bg-red-700">Delete Course</button></div></form></div></div>
+        
+        <!-- Footer -->
+        <footer class="bg-slate-950 border-t border-slate-800 py-8">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center text-gray-400">
+                <p>&copy; 2024 AI Tech Academy. All Rights Reserved.</p>
+                <div class="flex justify-center space-x-6 mt-4"><a href="#" class="hover:text-white">Twitter</a><a href="#" class="hover:text-white">LinkedIn</a><a href="#" class="hover:text-white">GitHub</a></div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Firebase SDK & App Logic -->
+    <script type="module">
+        // --- Firebase Imports ---
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+// ... existing code ... -->
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
+
+        // --- Firebase Configuration ---
+        // In a real hosting environment, these values would be replaced by environment variables.
+        // For local development, we use your production keys.
+        const firebaseConfig = {
+            apiKey: "%VITE_API_KEY%",
+            authDomain: "%VITE_AUTH_DOMAIN%",
+            projectId: "%VITE_PROJECT_ID%",
+            storageBucket: "%VITE_STORAGE_BUCKET%",
+            messagingSenderId: "%VITE_MESSAGING_SENDER_ID%",
+            appId: "%VITE_APP_ID%",
+            measurementId: "%VITE_MEASUREMENT_ID%"
+        };
+        
+        // Fallback for the Gemini environment
+        if (firebaseConfig.apiKey.startsWith('%')) {
+             Object.assign(firebaseConfig, {
+                apiKey: "AIzaSyBatmm18QrJzG83pGbgvkasIIXpggxo_jg",
+                authDomain: "aitechacademy-4b195.firebaseapp.com",
+                projectId: "aitechacademy-4b195",
+                storageBucket: "aitechacademy-4b195.appspot.com",
+                messagingSenderId: "1027034915833",
+                appId: "1:1027034915833:web:899857b2cb028b67f99328",
+                measurementId: "G-PB9DB75YFY"
+            });
+        }
+
+
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const ADMIN_UID = "vMyV3mqqNqZxqqMXK579ias8PKz1"; 
+// ... existing code ... -->
+
