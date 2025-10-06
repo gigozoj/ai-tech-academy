@@ -154,37 +154,571 @@
         // --- Firebase Imports ---
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-// ... existing code ... -->
+        import { getFirestore, collection, doc, getDocs, setDoc, getDoc, addDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
 
         // --- Firebase Configuration ---
-        // In a real hosting environment, these values would be replaced by environment variables.
-        // For local development, we use your production keys.
         const firebaseConfig = {
-            apiKey: "%VITE_API_KEY%",
-            authDomain: "%VITE_AUTH_DOMAIN%",
-            projectId: "%VITE_PROJECT_ID%",
-            storageBucket: "%VITE_STORAGE_BUCKET%",
-            messagingSenderId: "%VITE_MESSAGING_SENDER_ID%",
-            appId: "%VITE_APP_ID%",
-            measurementId: "%VITE_MEASUREMENT_ID%"
+            apiKey: "AIzaSyBatmm18QrJzG83pGbgvkasIIXpggxo_jg",
+            authDomain: "aitechacademy-4b195.firebaseapp.com",
+            projectId: "aitechacademy-4b195",
+            storageBucket: "aitechacademy-4b195.appspot.com",
+            messagingSenderId: "1027034915833",
+            appId: "1:1027034915833:web:899857b2cb028b67f99328",
+            measurementId: "G-PB9DB75YFY"
         };
-        
-        // Fallback for the Gemini environment
-        if (firebaseConfig.apiKey.startsWith('%')) {
-             Object.assign(firebaseConfig, {
-                apiKey: "AIzaSyBatmm18QrJzG83pGbgvkasIIXpggxo_jg",
-                authDomain: "aitechacademy-4b195.firebaseapp.com",
-                projectId: "aitechacademy-4b195",
-                storageBucket: "aitechacademy-4b195.appspot.com",
-                messagingSenderId: "1027034915833",
-                appId: "1:1027034915833:web:899857b2cb028b67f99328",
-                measurementId: "G-PB9DB75YFY"
-            });
-        }
-
 
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
         const ADMIN_UID = "vMyV3mqqNqZxqqMXK579ias8PKz1"; 
-// ... existing code ... -->
+
+        // --- Initialize Firebase ---
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const storage = getStorage(app);
+
+        // --- Global State ---
+        let currentUser = null;
+        let isAdmin = false;
+
+        // --- UI Element Selectors ---
+        const pageContent = {
+            landing: document.getElementById('landing-page'),
+            dashboard: document.getElementById('dashboard-page'),
+            courseDetail: document.getElementById('course-detail-page'),
+            admin: document.getElementById('admin-page'),
+        };
+
+        const nav = {
+            authBtn: document.getElementById('auth-button'),
+            mobileAuthBtn: document.getElementById('mobile-auth-button'),
+            logoutBtn: document.getElementById('logout-button'),
+            mobileLogoutBtn: document.getElementById('mobile-logout-button'),
+            dashboardBtn: document.getElementById('dashboard-button'),
+            mobileDashboardBtn: document.getElementById('mobile-dashboard-button'),
+            adminBtn: document.getElementById('admin-button'),
+            mobileAdminBtn: document.getElementById('mobile-admin-button'),
+            mobileMenu: document.getElementById('mobile-menu'),
+            mobileMenuBtn: document.getElementById('mobile-menu-button'),
+        };
+
+        const authModal = {
+            container: document.getElementById('auth-modal'),
+            closeBtn: document.getElementById('auth-modal-close'),
+            form: document.getElementById('auth-form'),
+            title: document.getElementById('auth-title'),
+            submitBtn: document.getElementById('auth-submit-button'),
+            toggleLink: document.getElementById('auth-toggle-link'),
+            emailInput: document.getElementById('email'),
+            passwordInput: document.getElementById('password'),
+            errorMsg: document.getElementById('auth-error'),
+        };
+        
+        const editModal = {
+            container: document.getElementById('edit-course-modal'),
+            closeBtn: document.getElementById('edit-modal-close'),
+            form: document.getElementById('edit-course-form'),
+            idInput: document.getElementById('edit-course-id'),
+            titleInput: document.getElementById('edit-course-title'),
+            descriptionInput: document.getElementById('edit-course-description'),
+            modulesInput: document.getElementById('edit-course-modules'),
+            imagePreview: document.getElementById('edit-course-image-preview'),
+            imageUpload: document.getElementById('edit-course-image-upload'),
+            imageUrlInput: document.getElementById('edit-course-image-url'),
+            successMsg: document.getElementById('edit-form-success'),
+            errorMsg: document.getElementById('edit-form-error'),
+            updateBtn: document.getElementById('update-course-button'),
+            deleteBtn: document.getElementById('delete-course-button'),
+        };
+
+        const addCourseForm = {
+            form: document.getElementById('add-course-form'),
+            titleInput: document.getElementById('course-title'),
+            descriptionInput: document.getElementById('course-description'),
+            imageUpload: document.getElementById('course-image-upload'),
+            imageUrlInput: document.getElementById('course-image-url'),
+            modulesInput: document.getElementById('course-modules'),
+            submitBtn: document.getElementById('add-course-button'),
+            successMsg: document.getElementById('course-form-success'),
+            errorMsg: document.getElementById('course-form-error'),
+        };
+
+        // --- Page Navigation Logic ---
+        const showPage = (pageName) => {
+            Object.values(pageContent).forEach(page => page.classList.add('hidden'));
+            if (pageContent[pageName]) {
+                pageContent[pageName].classList.remove('hidden');
+            }
+            window.scrollTo(0, 0);
+        };
+
+        // --- UI Update Logic ---
+        const updateNavUI = () => {
+            const isLoggedIn = !!currentUser;
+            nav.authBtn.classList.toggle('hidden', isLoggedIn);
+            nav.mobileAuthBtn.classList.toggle('hidden', isLoggedIn);
+            nav.logoutBtn.classList.toggle('hidden', !isLoggedIn);
+            nav.mobileLogoutBtn.classList.toggle('hidden', !isLoggedIn);
+            nav.dashboardBtn.classList.toggle('hidden', !isLoggedIn);
+            nav.mobileDashboardBtn.classList.toggle('hidden', !isLoggedIn);
+            nav.adminBtn.classList.toggle('hidden', !isAdmin);
+            nav.mobileAdminBtn.classList.toggle('hidden', !isAdmin);
+        };
+
+        // --- Authentication ---
+        onAuthStateChanged(auth, (user) => {
+            currentUser = user;
+            isAdmin = user ? user.uid === ADMIN_UID.trim() : false;
+            console.log('Auth state changed. User:', user?.uid, 'Is Admin:', isAdmin);
+            updateNavUI();
+            if (!user) {
+                showPage('landing'); 
+            }
+        });
+
+        const handleAuthFormSubmit = async (e) => {
+            e.preventDefault();
+            const isSignUp = authModal.title.textContent.includes('Sign Up');
+            const email = authModal.emailInput.value;
+            const password = authModal.passwordInput.value;
+            
+            authModal.errorMsg.classList.add('hidden');
+            authModal.submitBtn.disabled = true;
+
+            try {
+                if (isSignUp) {
+                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                    const userDocRef = doc(db, `/artifacts/${appId}/users`, userCredential.user.uid);
+                    await setDoc(userDocRef, { email: userCredential.user.email, createdAt: new Date() });
+                } else {
+                    await signInWithEmailAndPassword(auth, email, password);
+                }
+                authModal.container.classList.add('hidden');
+                authModal.form.reset();
+            } catch (error) {
+                console.error('Authentication Error:', error);
+                authModal.errorMsg.textContent = error.message;
+                authModal.errorMsg.classList.remove('hidden');
+            } finally {
+                authModal.submitBtn.disabled = false;
+            }
+        };
+        
+        // --- Core Functions (Data Loading, etc.) ---
+        const loadCourses = async () => {
+            const courseListEl = document.getElementById('course-list');
+            try {
+                const coursesCol = collection(db, `/artifacts/${appId}/public/data/courses`);
+                const snapshot = await getDocs(coursesCol);
+
+                if (snapshot.empty) {
+                    courseListEl.innerHTML = '<p class="text-gray-400 col-span-full text-center">No courses available yet. The admin needs to add some!</p>';
+                    return;
+                }
+                
+                courseListEl.innerHTML = '';
+                snapshot.forEach(doc => {
+                    const course = doc.data();
+                    const courseCard = `
+                        <div class="bg-slate-800 rounded-lg overflow-hidden flex flex-col group">
+                            <img src="${course.imageUrl}" alt="${course.title}" class="w-full h-48 object-cover group-hover:opacity-80 transition-opacity">
+                            <div class="p-6 flex flex-col flex-grow">
+                                <h3 class="text-xl font-bold text-white mb-2">${course.title}</h3>
+                                <p class="text-gray-400 flex-grow mb-4">${course.description}</p>
+                                <a href="#" data-course-id="${doc.id}" class="course-details-link mt-auto text-blue-400 font-semibold hover:text-blue-300 self-start">View Details &rarr;</a>
+                            </div>
+                        </div>`;
+                    courseListEl.innerHTML += courseCard;
+                });
+            } catch (error) {
+                console.error("Error loading courses:", error);
+                courseListEl.innerHTML = `<p class="text-red-400 col-span-full text-center">Could not load courses. Error: ${error.message}</p>`;
+            }
+        };
+
+        const loadDashboardData = async () => {
+            if (!currentUser) return;
+            const userInfoEl = document.getElementById('user-info');
+            const myCoursesListEl = document.getElementById('my-courses-list');
+            userInfoEl.innerHTML = `<p class="text-white">Welcome back, <span class="font-bold">${currentUser.email}</span>!</p> <p class="text-sm text-gray-400">User ID: ${currentUser.uid}</p>`;
+            
+            try {
+                const enrollmentsCol = collection(db, `/artifacts/${appId}/users/${currentUser.uid}/enrollments`);
+                const snapshot = await getDocs(enrollmentsCol);
+
+                if (snapshot.empty) {
+                    myCoursesListEl.innerHTML = '<p class="text-gray-400 col-span-full">You are not enrolled in any courses yet.</p>';
+                    return;
+                }
+
+                myCoursesListEl.innerHTML = '';
+                snapshot.forEach(doc => {
+                    const enrollment = doc.data();
+                    const courseCard = `
+                        <div class="bg-slate-800 rounded-lg overflow-hidden flex flex-col group">
+                            <img src="${enrollment.course.imageUrl}" alt="${enrollment.course.title}" class="w-full h-48 object-cover group-hover:opacity-80 transition-opacity">
+                            <div class="p-6 flex flex-col flex-grow">
+                                <h3 class="text-xl font-bold text-white mb-2">${enrollment.course.title}</h3>
+                                <a href="#" data-course-id="${doc.id}" class="course-details-link mt-auto text-blue-400 font-semibold hover:text-blue-300 self-start">Go to Course &rarr;</a>
+                            </div>
+                        </div>`;
+                    myCoursesListEl.innerHTML += courseCard;
+                });
+            } catch (error) {
+                console.error("Error loading enrolled courses:", error);
+                myCoursesListEl.innerHTML = '<p class="text-red-400 col-span-full">Could not load your courses.</p>';
+            }
+        };
+
+        const showCourseDetailPage = async (courseId) => {
+            showPage('courseDetail');
+            const contentEl = document.getElementById('course-detail-content');
+            contentEl.innerHTML = '<p class="text-white text-center">Loading course...</p>';
+
+            try {
+                const courseRef = doc(db, `/artifacts/${appId}/public/data/courses`, courseId);
+                const courseSnap = await getDoc(courseRef);
+
+                if (!courseSnap.exists()) {
+                    contentEl.innerHTML = '<p class="text-red-400 text-center">Course not found.</p>';
+                    return;
+                }
+
+                const course = courseSnap.data();
+                let isEnrolled = false;
+                if (currentUser) {
+                    const enrollmentRef = doc(db, `/artifacts/${appId}/users/${currentUser.uid}/enrollments`, courseId);
+                    const enrollmentSnap = await getDoc(enrollmentRef);
+                    isEnrolled = enrollmentSnap.exists();
+                }
+                
+                let headerHtml = `<div class="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12"><div class="md:col-span-2"><h1 class="text-3xl md:text-4xl font-bold text-white">${course.title}</h1><p class="mt-4 text-lg text-gray-400">${course.description}</p><div class="mt-8">${isEnrolled ? `<button class="w-full md:w-auto bg-green-600 text-white font-semibold py-3 px-8 rounded-lg cursor-default">You are enrolled</button>` : `<button id="enroll-button" data-course-id="${courseSnap.id}" class="w-full md:w-auto bg-blue-500 text-white font-semibold py-3 px-8 rounded-lg hover:bg-blue-600">Enroll Now</button>`}</div></div><div class="md:col-span-1"><img src="${course.imageUrl}" alt="${course.title}" class="rounded-lg shadow-lg w-full"></div></div>`;
+                let contentHtml = '<div class="mt-12 border-t border-slate-700 pt-8"><h2 class="text-2xl font-bold text-white mb-6">Course Content</h2>';
+                
+                if (course.modules && course.modules.length > 0) {
+                    contentHtml += '<div class="space-y-4" id="accordion-container">';
+                    course.modules.forEach((module, index) => {
+                        const isOpen = module.isOpen || false; // Default to closed if not specified
+                        contentHtml += `
+                            <div class="bg-slate-800 rounded-lg">
+                                <button class="accordion-header w-full flex justify-between items-center text-left p-5">
+                                    <h3 class="text-xl font-bold text-white">Module ${index + 1}: ${module.title}</h3>
+                                    <svg class="w-6 h-6 text-gray-400 transform transition-transform ${isOpen ? 'rotate-180' : ''}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                                </button>
+                                <div class="accordion-content" style="${isOpen ? 'max-height: 500px;' : ''}">
+                                    <div class="p-5 border-t border-slate-700">
+                                        <ul class="list-disc list-inside space-y-2 pl-2 text-gray-400">${module.lessons.map(lesson => `<li>${lesson}</li>`).join('')}</ul>
+                                    </div>
+                                </div>
+                            </div>`;
+                    });
+                    contentHtml += '</div>';
+                } else {
+                    contentHtml += '<p class="text-gray-400">Course content is not yet available.</p>';
+                }
+                contentHtml += '</div>';
+                contentEl.innerHTML = headerHtml + contentHtml;
+            } catch (error) {
+                console.error("Error loading course details:", error);
+                contentEl.innerHTML = '<p class="text-red-400 text-center">Could not load course details.</p>';
+            }
+        };
+
+        // --- Admin Functions ---
+        const loadCoursesForAdmin = async () => {
+            const listEl = document.getElementById('manage-courses-list');
+            try {
+                const coursesCol = collection(db, `/artifacts/${appId}/public/data/courses`);
+                const snapshot = await getDocs(coursesCol);
+                if (snapshot.empty) {
+                    listEl.innerHTML = '<p class="text-gray-400 text-center">No courses found to manage.</p>';
+                    return;
+                }
+                listEl.innerHTML = '';
+                snapshot.forEach(doc => {
+                    const course = doc.data();
+                    const courseItem = `<div class="flex items-center justify-between bg-slate-700 p-4 rounded-lg"><div><p class="font-bold text-white">${course.title}</p></div><button data-course-id="${doc.id}" class="edit-course-btn bg-blue-500 text-white font-semibold px-4 py-2 rounded-lg hover:bg-blue-600">Edit</button></div>`;
+                    listEl.innerHTML += courseItem;
+                });
+            } catch (error) {
+                console.error("Error loading courses for admin:", error);
+                listEl.innerHTML = '<p class="text-red-400 text-center">Could not load courses.</p>';
+            }
+        };
+
+        const handleAddCourse = async (e) => {
+            e.preventDefault();
+            const { form, successMsg, errorMsg, submitBtn, titleInput, descriptionInput, imageUpload, imageUrlInput, modulesInput } = addCourseForm;
+            const imageFile = imageUpload.files[0];
+            const imageUrlText = imageUrlInput.value.trim();
+
+            successMsg.classList.add('hidden');
+            errorMsg.classList.add('hidden');
+            submitBtn.disabled = true;
+
+            let finalImageUrl = 'https://placehold.co/600x400/1e293b/94a3b8?text=AI+Course';
+
+            try {
+                if (imageFile) {
+                    submitBtn.textContent = 'Uploading Image...';
+                    const storageRef = ref(storage, `course-images/${Date.now()}_${imageFile.name}`);
+                    await uploadBytes(storageRef, imageFile);
+                    finalImageUrl = await getDownloadURL(storageRef);
+                } else if (imageUrlText) {
+                    finalImageUrl = imageUrlText;
+                }
+                
+                submitBtn.textContent = 'Adding Course...';
+                
+                const modules = JSON.parse(modulesInput.value);
+                const coursesColRef = collection(db, `/artifacts/${appId}/public/data/courses`);
+                await addDoc(coursesColRef, {
+                    title: titleInput.value,
+                    description: descriptionInput.value,
+                    imageUrl: finalImageUrl,
+                    modules,
+                    createdAt: new Date()
+                });
+                
+                successMsg.textContent = 'Course added successfully!';
+                successMsg.classList.remove('hidden');
+                form.reset();
+                loadCourses();
+                loadCoursesForAdmin();
+                setTimeout(() => successMsg.classList.add('hidden'), 3000);
+
+            } catch (error) {
+                console.error("Failed to add course:", error);
+                errorMsg.textContent = `Failed to add course. ${error.message}`;
+                errorMsg.classList.remove('hidden');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Add Course';
+            }
+        };
+
+        const openEditModal = async (courseId) => {
+            const courseRef = doc(db, `/artifacts/${appId}/public/data/courses`, courseId);
+            const courseSnap = await getDoc(courseRef);
+            if (!courseSnap.exists()) return alert("Error: Course not found.");
+            
+            const course = courseSnap.data();
+            editModal.idInput.value = courseSnap.id;
+            editModal.titleInput.value = course.title;
+            editModal.descriptionInput.value = course.description;
+            editModal.modulesInput.value = JSON.stringify(course.modules, null, 2);
+            editModal.imagePreview.src = course.imageUrl;
+            editModal.imageUpload.value = '';
+            editModal.imageUrlInput.value = '';
+            editModal.successMsg.classList.add('hidden');
+            editModal.errorMsg.classList.add('hidden');
+            editModal.container.classList.remove('hidden');
+        };
+
+        const handleUpdateCourse = async (e) => {
+            e.preventDefault();
+            const courseId = editModal.idInput.value;
+            const { successMsg, errorMsg, updateBtn, imageUpload, imageUrlInput } = editModal;
+            
+            successMsg.classList.add('hidden');
+            errorMsg.classList.add('hidden');
+            updateBtn.disabled = true;
+            updateBtn.textContent = 'Saving...';
+
+            try {
+                let imageUrl = editModal.imagePreview.src;
+                const newImageFile = imageUpload.files[0];
+                const newImageUrlText = imageUrlInput.value.trim();
+
+                if (newImageFile) {
+                    updateBtn.textContent = 'Uploading Image...';
+                    const storageRef = ref(storage, `course-images/${Date.now()}_${newImageFile.name}`);
+                    await uploadBytes(storageRef, newImageFile);
+                    imageUrl = await getDownloadURL(storageRef);
+                } else if (newImageUrlText) {
+                    imageUrl = newImageUrlText;
+                }
+
+                updateBtn.textContent = 'Saving...';
+                const courseRef = doc(db, `/artifacts/${appId}/public/data/courses`, courseId);
+                await updateDoc(courseRef, {
+                    title: editModal.titleInput.value,
+                    description: editModal.descriptionInput.value,
+                    imageUrl,
+                    modules: JSON.parse(editModal.modulesInput.value)
+                });
+
+                successMsg.textContent = 'Course updated successfully!';
+                successMsg.classList.remove('hidden');
+                loadCourses();
+                loadCoursesForAdmin();
+                setTimeout(() => editModal.container.classList.add('hidden'), 2000);
+
+            } catch (error) {
+                console.error("Error updating course:", error);
+                errorMsg.textContent = `Update failed: ${error.message}`;
+                errorMsg.classList.remove('hidden');
+            } finally {
+                updateBtn.disabled = false;
+                updateBtn.textContent = 'Save Changes';
+            }
+        };
+
+        const handleDeleteCourse = async () => {
+            const courseId = editModal.idInput.value;
+            if (confirm("Are you sure you want to permanently delete this course?")) {
+                try {
+                    await deleteDoc(doc(db, `/artifacts/${appId}/public/data/courses`, courseId));
+                    editModal.container.classList.add('hidden');
+                    loadCourses();
+                    loadCoursesForAdmin();
+                } catch (error) {
+                    console.error("Error deleting course:", error);
+                    alert("Failed to delete course. See console for details.");
+                }
+            }
+        };
+
+        // --- Event Listeners Setup ---
+        const setupEventListeners = () => {
+            // Navigation
+            document.getElementById('home-link').addEventListener('click', (e) => { e.preventDefault(); showPage('landing'); });
+            document.getElementById('back-to-courses-link').addEventListener('click', (e) => { e.preventDefault(); showPage('landing'); });
+            nav.dashboardBtn.addEventListener('click', (e) => { e.preventDefault(); showPage('dashboard'); loadDashboardData(); });
+            nav.mobileDashboardBtn.addEventListener('click', (e) => { e.preventDefault(); showPage('dashboard'); loadDashboardData(); });
+
+            const showAdminPageWithSetup = () => {
+                showPage('admin');
+                loadCoursesForAdmin();
+                const modulesTextarea = document.getElementById('course-modules');
+                if (!modulesTextarea.value) {
+                    modulesTextarea.value = JSON.stringify([
+                        { "title": "Module 1: Getting Started", "isOpen": true, "lessons": ["Lesson 1.1: Intro", "Lesson 1.2: Basics"] },
+                        { "title": "Module 2: Advanced Concepts", "isOpen": false, "lessons": ["Lesson 2.1: Deep Dive", "Lesson 2.2: Project"] }
+                    ], null, 2);
+                }
+            };
+            nav.adminBtn.addEventListener('click', (e) => { e.preventDefault(); showAdminPageWithSetup(); });
+            nav.mobileAdminBtn.addEventListener('click', (e) => { e.preventDefault(); showAdminPageWithSetup(); });
+
+            nav.logoutBtn.addEventListener('click', () => signOut(auth));
+            nav.mobileLogoutBtn.addEventListener('click', () => signOut(auth));
+            
+            // Mobile Menu
+            nav.mobileMenuBtn.addEventListener('click', () => nav.mobileMenu.classList.toggle('hidden'));
+            
+            // Auth Modal
+            const openAuthModal = (isSignUp = false) => {
+                authModal.title.textContent = isSignUp ? 'Sign Up' : 'Sign In';
+                authModal.submitBtn.textContent = isSignUp ? 'Create Account' : 'Sign In';
+                authModal.toggleLink.textContent = isSignUp ? 'Already have an account? Sign In' : "Don't have an account? Sign Up";
+                authModal.errorMsg.classList.add('hidden');
+                authModal.container.classList.remove('hidden');
+            };
+            nav.authBtn.addEventListener('click', () => openAuthModal(false));
+            nav.mobileAuthBtn.addEventListener('click', () => openAuthModal(false));
+            authModal.closeBtn.addEventListener('click', () => authModal.container.classList.add('hidden'));
+            authModal.toggleLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                openAuthModal(!authModal.title.textContent.includes('Sign Up'));
+            });
+            authModal.form.addEventListener('submit', handleAuthFormSubmit);
+
+            // Edit Modal
+            editModal.closeBtn.addEventListener('click', () => editModal.container.classList.add('hidden'));
+            editModal.form.addEventListener('submit', handleUpdateCourse);
+            editModal.deleteBtn.addEventListener('click', handleDeleteCourse);
+
+            // Add Course Form
+            addCourseForm.form.addEventListener('submit', handleAddCourse);
+
+            // Smooth scrolling for nav links
+            document.querySelectorAll('.nav-link').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        e.preventDefault();
+                        nav.mobileMenu.classList.add('hidden');
+                        showPage('landing');
+                        setTimeout(() => targetElement.scrollIntoView({ behavior: 'smooth' }), 100);
+                    }
+                });
+            });
+
+            // Event delegation for dynamically added content
+            document.body.addEventListener('click', async (e) => {
+                if (e.target.matches('.course-details-link')) {
+                    e.preventDefault();
+                    const courseId = e.target.dataset.courseId;
+                    if (courseId) showCourseDetailPage(courseId);
+                }
+                if (e.target.matches('.edit-course-btn')) {
+                    e.preventDefault();
+                    const courseId = e.target.dataset.courseId;
+                    if (courseId) openEditModal(courseId);
+                }
+                if (e.target.closest('.accordion-header')) {
+                    e.preventDefault();
+                    const header = e.target.closest('.accordion-header');
+                    const content = header.nextElementSibling;
+                    const icon = header.querySelector('svg');
+
+                    if (content.style.maxHeight) {
+                        content.style.maxHeight = null;
+                        icon.classList.remove('rotate-180');
+                    } else {
+                        // Optional: Close other accordions first
+                        document.querySelectorAll('#accordion-container .accordion-content').forEach(el => {
+                            el.style.maxHeight = null;
+                            el.previousElementSibling.querySelector('svg').classList.remove('rotate-180');
+                        });
+                        
+                        content.style.maxHeight = content.scrollHeight + "px";
+                        icon.classList.add('rotate-180');
+                    }
+                }
+                if (e.target.matches('#enroll-button')) {
+                    e.preventDefault();
+                    if (!currentUser) return openAuthModal();
+                    
+                    const button = e.target;
+                    const courseId = button.dataset.courseId;
+                    button.disabled = true;
+                    button.textContent = 'Enrolling...';
+
+                    try {
+                        const courseRef = doc(db, `/artifacts/${appId}/public/data/courses`, courseId);
+                        const courseSnap = await getDoc(courseRef);
+                        if (!courseSnap.exists()) throw new Error("Course not found");
+
+                        const enrollmentRef = doc(db, `/artifacts/${appId}/users/${currentUser.uid}/enrollments`, courseId);
+                        await setDoc(enrollmentRef, {
+                            enrolledAt: new Date(),
+                            course: {
+                                title: courseSnap.data().title,
+                                imageUrl: courseSnap.data().imageUrl
+                            }
+                        });
+                        showCourseDetailPage(courseId); // Refresh the page to show enrolled state
+                    } catch (error) {
+                        console.error("Enrollment failed:", error);
+                        button.textContent = 'Enrollment Failed';
+                        button.disabled = false;
+                    }
+                }
+            });
+        };
+
+        // --- App Initialization ---
+        const initializeAppCore = () => {
+            setupEventListeners();
+            loadCourses();
+            console.log("App Initialized with complete logic.");
+        };
+
+        initializeAppCore();
+    </script>
+</body>
+</html>
 
