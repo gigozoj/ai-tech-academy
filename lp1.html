@@ -218,22 +218,35 @@
             <button id="close-modal-button" class="absolute top-4 right-4 text-gray-400 hover:text-white">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
-            <h3 class="text-2xl font-bold text-center text-yellow-400 mb-2">Get Your FREE Access</h3>
-            <p class="text-center text-gray-300 mb-6">Enter your details below to join the community.</p>
-            <form id="signup-form">
-                <div class="mb-4">
-                    <label for="name" class="block text-gray-300 text-sm font-bold mb-2">Full Name</label>
-                    <input type="text" id="name" name="name" required class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-yellow-400">
-                </div>
-                <div class="mb-6">
-                    <label for="email" class="block text-gray-300 text-sm font-bold mb-2">Email Address</label>
-                    <input type="email" id="email" name="email" required class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-yellow-400">
-                </div>
-                <button type="submit" id="submit-button" class="w-full bg-yellow-400 text-gray-900 font-bold text-lg py-3 px-8 rounded-lg cta-button hover:bg-yellow-500 transition-all duration-300">
-                    Join Now For Free
-                </button>
-                <p id="form-error" class="text-red-500 text-center text-sm mt-4"></p>
-            </form>
+            
+            <!-- Form View -->
+            <div id="form-view">
+                <h3 class="text-2xl font-bold text-center text-yellow-400 mb-2">Get Your FREE Access</h3>
+                <p class="text-center text-gray-300 mb-6">Enter your details below to join the community.</p>
+                <form id="signup-form">
+                    <div class="mb-4">
+                        <label for="name" class="block text-gray-300 text-sm font-bold mb-2">Full Name</label>
+                        <input type="text" id="name" name="name" required class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-yellow-400">
+                    </div>
+                    <div class="mb-6">
+                        <label for="email" class="block text-gray-300 text-sm font-bold mb-2">Email Address</label>
+                        <input type="email" id="email" name="email" required class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-yellow-400">
+                    </div>
+                    <button type="submit" id="submit-button" class="w-full bg-yellow-400 text-gray-900 font-bold text-lg py-3 px-8 rounded-lg cta-button hover:bg-yellow-500 transition-all duration-300">
+                        Join Now For Free
+                    </button>
+                    <p id="form-error" class="text-red-500 text-center text-sm mt-4"></p>
+                </form>
+            </div>
+
+            <!-- Success View -->
+            <div id="success-view" class="hidden text-center">
+                <svg class="w-20 h-20 text-green-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <h3 class="text-2xl font-bold text-center text-yellow-400 mb-2">Thank You! You're In.</h3>
+                <p class="text-gray-300 mb-6">
+                    Please check your email for a confirmation and next steps. We're excited to have you with us!
+                </p>
+            </div>
         </div>
     </div>
 
@@ -242,16 +255,24 @@
 
         // --- Get DOM Elements ---
         const modal = document.getElementById('form-modal');
-        const modalContent = document.getElementById('modal-content');
         const closeModalButton = document.getElementById('close-modal-button');
         const openModalButtons = document.querySelectorAll('.open-modal-button');
         const signupForm = document.getElementById('signup-form');
         const submitButton = document.getElementById('submit-button');
         const formError = document.getElementById('form-error');
+        const formView = document.getElementById('form-view');
+        const successView = document.getElementById('success-view');
 
         // --- Event Listeners to Open Modal ---
         openModalButtons.forEach(button => {
             button.addEventListener('click', () => {
+                // Reset form to its initial state when opening
+                formView.classList.remove('hidden');
+                successView.classList.add('hidden');
+                formError.textContent = '';
+                signupForm.reset();
+                submitButton.disabled = false;
+                submitButton.textContent = 'Join Now For Free';
                 modal.classList.remove('hidden');
             });
         });
@@ -299,8 +320,9 @@
                 });
 
                 if (response.ok) {
-                    // Success! Redirect to the thank you page.
-                    window.location.href = 'thank-you.html';
+                    // Success! Show the thank you message inside the modal.
+                    formView.classList.add('hidden');
+                    successView.classList.remove('hidden');
                 } else {
                     // Handle server errors (e.g., webhook is down)
                     throw new Error('Submission failed. Please try again.');
@@ -318,5 +340,4 @@
 
 </body>
 </html>
-
 
