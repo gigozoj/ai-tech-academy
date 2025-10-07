@@ -32,6 +32,10 @@
         .faq-item {
             border-bottom: 1px solid #374151;
         }
+        /* Styles for the modal */
+        #form-modal.hidden {
+            display: none;
+        }
     </style>
 </head>
 <body class="antialiased">
@@ -73,9 +77,9 @@
     
     <!-- NEW: Repeated CTA Section 1 -->
     <section class="text-center pb-8 px-4">
-         <a href="#" class="mt-4 inline-block bg-yellow-400 text-gray-900 font-bold text-xl md:text-2xl py-4 px-8 rounded-lg cta-button hover:bg-yellow-500 transition-all duration-300 transform hover:scale-105">
+         <button class="open-modal-button mt-4 inline-block bg-yellow-400 text-gray-900 font-bold text-xl md:text-2xl py-4 px-8 rounded-lg cta-button hover:bg-yellow-500 transition-all duration-300 transform hover:scale-105">
             Yes! I Want FREE Access! &rarr;
-        </a>
+        </button>
     </section>
 
     <!-- Decorative Divider -->
@@ -186,9 +190,9 @@
         <div class="container mx-auto max-w-3xl">
             <h2 class="text-3xl md:text-4xl font-bold text-gray-900">Ready To Join The #1 Community For Online Sellers?</h2>
             <p class="mt-4 text-gray-800 text-lg">Your business will thank you for it. It takes less than 10 seconds to get in.</p>
-            <a href="#" class="mt-8 inline-block bg-gray-900 text-white font-bold text-2xl md:text-3xl py-5 px-10 rounded-lg cta-button hover:bg-black transition-all duration-300 transform hover:scale-105">
+            <button class="open-modal-button mt-8 inline-block bg-gray-900 text-white font-bold text-2xl md:text-3xl py-5 px-10 rounded-lg cta-button hover:bg-black transition-all duration-300 transform hover:scale-105">
                 Click Here To Join For FREE! &rarr;
-            </a>
+            </button>
         </div>
     </section>
 
@@ -207,9 +211,112 @@
     <footer class="text-center py-8 px-4 border-t border-gray-800">
         <p class="text-gray-500">&copy; 2024 Skool LLC - A High-Leverage & Hold CTRL Venture of Eagle, ID & Ohio</p>
     </footer>
+    
+    <!-- Signup Form Modal -->
+    <div id="form-modal" class="hidden fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center p-4 z-50">
+        <div id="modal-content" class="bg-gray-800 p-8 rounded-lg shadow-2xl w-full max-w-md relative">
+            <button id="close-modal-button" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <h3 class="text-2xl font-bold text-center text-yellow-400 mb-2">Get Your FREE Access</h3>
+            <p class="text-center text-gray-300 mb-6">Enter your details below to join the community.</p>
+            <form id="signup-form">
+                <div class="mb-4">
+                    <label for="name" class="block text-gray-300 text-sm font-bold mb-2">Full Name</label>
+                    <input type="text" id="name" name="name" required class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-yellow-400">
+                </div>
+                <div class="mb-6">
+                    <label for="email" class="block text-gray-300 text-sm font-bold mb-2">Email Address</label>
+                    <input type="email" id="email" name="email" required class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-yellow-400">
+                </div>
+                <button type="submit" id="submit-button" class="w-full bg-yellow-400 text-gray-900 font-bold text-lg py-3 px-8 rounded-lg cta-button hover:bg-yellow-500 transition-all duration-300">
+                    Join Now For Free
+                </button>
+                <p id="form-error" class="text-red-500 text-center text-sm mt-4"></p>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // --- MODAL AND FORM SUBMISSION SCRIPT ---
+
+        // --- Get DOM Elements ---
+        const modal = document.getElementById('form-modal');
+        const modalContent = document.getElementById('modal-content');
+        const closeModalButton = document.getElementById('close-modal-button');
+        const openModalButtons = document.querySelectorAll('.open-modal-button');
+        const signupForm = document.getElementById('signup-form');
+        const submitButton = document.getElementById('submit-button');
+        const formError = document.getElementById('form-error');
+
+        // --- Event Listeners to Open Modal ---
+        openModalButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                modal.classList.remove('hidden');
+            });
+        });
+
+        // --- Event Listeners to Close Modal ---
+        const closeModal = () => {
+            modal.classList.add('hidden');
+        };
+
+        closeModalButton.addEventListener('click', closeModal);
+
+        // Close modal if user clicks on the background overlay
+        modal.addEventListener('click', (event) => {
+            if (event.target === modal) {
+                closeModal();
+            }
+        });
+
+        // --- Form Submission Logic ---
+        signupForm.addEventListener('submit', async (event) => {
+            event.preventDefault(); // Prevent default browser submission
+
+            // --- IMPORTANT: Replace with your actual Make.com Webhook URL ---
+            const webhookUrl = 'https://hook.us2.make.com/me6nx7e0tjy30v3a1kjexdmllowquj8x';
+
+            // Clear previous errors
+            formError.textContent = '';
+            // Show loading state
+            submitButton.disabled = true;
+            submitButton.textContent = 'Submitting...';
+
+            const formData = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                submittedAt: new Date().toISOString()
+            };
+
+            try {
+                const response = await fetch(webhookUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData),
+                });
+
+                if (response.ok) {
+                    // Success! Redirect to the thank you page.
+                    window.location.href = 'thank-you.html';
+                } else {
+                    // Handle server errors (e.g., webhook is down)
+                    throw new Error('Submission failed. Please try again.');
+                }
+
+            } catch (error) {
+                // Handle network errors or the error thrown above
+                formError.textContent = error.message;
+                // Reset button state
+                submitButton.disabled = false;
+                submitButton.textContent = 'Join Now For Free';
+            }
+        });
+    </script>
 
 </body>
 </html>
-
 
 
